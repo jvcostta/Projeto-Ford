@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +20,6 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule,
     MatCardModule,
     MatInputModule,
     MatButtonModule,
@@ -32,196 +31,198 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
   ],
   template: `
     <div class="settings-container">
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-brand">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="header-logo">
-        <span>Ford Recruitment</span>
-      </div>
-      
-      <div class="navbar-nav">
-        <div class="nav-profile">
-          <div class="profile-avatar">{{ getUserInitials() }}</div>
-          <span class="profile-name">{{ currentUser?.name }}</span>
+      <nav class="navbar">
+        <div class="navbar-container">
+          <div class="navbar-brand">
+            <div class="ford-logo">F</div>
+            <span>Ford Recruitment</span>
+          </div>
+          
+          <div class="navbar-nav">
+            <div class="nav-profile">
+              <div class="profile-avatar">{{ getUserInitials() }}</div>
+              <span class="profile-name">{{ currentUser?.name }}</span>
+            </div>
+            <button class="nav-link logout-btn" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Sign Out
+            </button>
+          </div>
         </div>
-        <button class="nav-link logout-btn" (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          Sair
-        </button>
+      </nav>
+
+      <div class="main-content">
+        <div class="container">
+          <div class="welcome-section">
+            <div class="welcome-content">
+              <h1>Account Settings</h1>
+              <p>Manage your profile and account preferences</p>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="sidebar">
+              <div class="nav-card">
+                <ul class="nav-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" (click)="activeTab = 0" [class.active]="activeTab === 0">
+                      <mat-icon class="nav-icon">person</mat-icon>
+                      Profile
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" (click)="activeTab = 1" [class.active]="activeTab === 1">
+                      <mat-icon class="nav-icon">lock</mat-icon>
+                      Security
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" (click)="activeTab = 2" [class.active]="activeTab === 2">
+                      <mat-icon class="nav-icon">settings</mat-icon>
+                      Preferences
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="content-card">
+              <!-- Profile Tab -->
+              <div *ngIf="activeTab === 0">
+                <h2 class="section-title">Personal Information</h2>
+                <form [formGroup]="profileForm" class="form-grid">
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Full Name</mat-label>
+                      <input matInput formControlName="name" placeholder="Enter your full name">
+                      <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
+                        Name is required
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Email</mat-label>
+                      <input matInput formControlName="email" placeholder="Enter your email">
+                      <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+                        Email is required
+                      </mat-error>
+                      <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                        Please enter a valid email
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-stroked-button type="button" (click)="resetProfileForm()">
+                      Cancel
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      type="button"
+                      [disabled]="profileForm.invalid"
+                      (click)="updateProfile()">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Security Tab -->
+              <div *ngIf="activeTab === 1">
+                <h2 class="section-title">Change Password</h2>
+                <form [formGroup]="passwordForm" class="form-grid">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Current Password</mat-label>
+                    <input matInput type="password" formControlName="currentPassword">
+                    <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+                      Current password is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>New Password</mat-label>
+                    <input matInput type="password" formControlName="newPassword">
+                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+                      New password is required
+                    </mat-error>
+                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                      Password must be at least 6 characters
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Confirm New Password</mat-label>
+                    <input matInput type="password" formControlName="confirmPassword">
+                    <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+                      Please confirm your password
+                    </mat-error>
+                    <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+                      Passwords do not match
+                    </mat-error>
+                  </mat-form-field>
+
+                  <div class="form-actions">
+                    <button mat-stroked-button type="button" (click)="resetPasswordForm()">
+                      Cancel
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      type="button"
+                      [disabled]="passwordForm.invalid"
+                      (click)="changePassword()">
+                      Update Password
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Preferences Tab -->
+              <div *ngIf="activeTab === 2">
+                <h2 class="section-title">Preferences</h2>
+                
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Email Notifications</h4>
+                    <p>Receive updates about your applications</p>
+                  </div>
+                  <mat-slide-toggle [(ngModel)]="preferences.emailNotifications"></mat-slide-toggle>
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Job Alerts</h4>
+                    <p>Get notified about new job opportunities</p>
+                  </div>
+                  <mat-slide-toggle [(ngModel)]="preferences.jobAlerts"></mat-slide-toggle>
+                </div>
+
+                <div class="form-actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    type="button"
+                    (click)="savePreferences()">
+                    Save Preferences
+                  </button>
+                </div>
+
+                <div class="danger-zone">
+                  <h3 class="danger-title">Danger Zone</h3>
+                  <p class="danger-description">
+                    Once you delete your account, there is no going back. Please be certain.
+                  </p>
+                  <button mat-raised-button color="warn" (click)="deleteAccount()">
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </nav>
-
-  <div class="main-content">
-    <div class="container">
-      <div class="welcome-section">
-        <div class="welcome-content">
-          <h1>Configurações da Conta</h1>
-          <p>Gerencie seu perfil e preferências da conta</p>
-        </div>
-      </div>
-
-      <div class="content-grid">
-        <div class="sidebar">
-          <div class="nav-card">
-            <ul class="nav-menu">
-              <li class="nav-item">
-                <a class="nav-link" (click)="activeTab = 0" [class.active]="activeTab === 0">
-                  <mat-icon class="nav-icon">person</mat-icon>
-                  Perfil
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" (click)="activeTab = 1" [class.active]="activeTab === 1">
-                  <mat-icon class="nav-icon">lock</mat-icon>
-                  Segurança
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" (click)="activeTab = 2" [class.active]="activeTab === 2">
-                  <mat-icon class="nav-icon">settings</mat-icon>
-                  Preferências
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="content-card">
-          <div *ngIf="activeTab === 0">
-            <h2 class="section-title">Informações Pessoais</h2>
-            <form [formGroup]="profileForm" class="form-grid">
-              <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>Nome Completo</mat-label>
-                  <input matInput formControlName="name" placeholder="Digite seu nome completo">
-                  <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
-                    Nome é obrigatório
-                  </mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>E-mail</mat-label>
-                  <input matInput formControlName="email" placeholder="Digite seu e-mail">
-                  <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
-                    E-mail é obrigatório
-                  </mat-error>
-                  <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
-                    Digite um e-mail válido
-                  </mat-error>
-                </mat-form-field>
-              </div>
-
-              <div class="form-actions">
-                <button mat-stroked-button type="button" (click)="resetProfileForm()">
-                  Cancelar
-                </button>
-                <button 
-                  mat-raised-button 
-                  color="primary" 
-                  type="button"
-                  [disabled]="profileForm.invalid"
-                  (click)="updateProfile()">
-                  Salvar Alterações
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div *ngIf="activeTab === 1">
-            <h2 class="section-title">Alterar Senha</h2>
-            <form [formGroup]="passwordForm" class="form-grid">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Senha Atual</mat-label>
-                <input matInput type="password" formControlName="currentPassword">
-                <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
-                  Senha atual é obrigatória
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Nova Senha</mat-label>
-                <input matInput type="password" formControlName="newPassword">
-                <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
-                  Nova senha é obrigatória
-                </mat-error>
-                <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
-                  A senha deve ter no mínimo 6 caracteres
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Confirmar Nova Senha</mat-label>
-                <input matInput type="password" formControlName="confirmPassword">
-                <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
-                  Confirme sua nova senha
-                </mat-error>
-                <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
-                  As senhas não coincidem
-                </mat-error>
-              </mat-form-field>
-
-              <div class="form-actions">
-                <button mat-stroked-button type="button" (click)="resetPasswordForm()">
-                  Cancelar
-                </button>
-                <button 
-                  mat-raised-button 
-                  color="primary" 
-                  type="button"
-                  [disabled]="passwordForm.invalid"
-                  (click)="changePassword()">
-                  Atualizar Senha
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div *ngIf="activeTab === 2">
-            <h2 class="section-title">Preferências</h2>
-            
-            <div class="preference-item">
-              <div class="preference-info">
-                <h4>Notificações por E-mail</h4>
-                <p>Receber atualizações sobre suas candidaturas</p>
-              </div>
-              <mat-slide-toggle [(ngModel)]="preferences.emailNotifications"></mat-slide-toggle>
-            </div>
-
-            <div class="preference-item">
-              <div class="preference-info">
-                <h4>Alertas de Vagas</h4>
-                <p>Receba notificações sobre novas oportunidades de emprego</p>
-              </div>
-              <mat-slide-toggle [(ngModel)]="preferences.jobAlerts"></mat-slide-toggle>
-            </div>
-
-            <div class="form-actions">
-              <button 
-                mat-raised-button 
-                color="primary" 
-                type="button"
-                (click)="savePreferences()">
-                Salvar Preferências
-              </button>
-            </div>
-
-            <div class="danger-zone">
-              <h3 class="danger-title">Zona de Risco</h3>
-              <p class="danger-description">
-                Ao excluir sua conta, não será possível recuperar os dados. Tenha certeza antes de prosseguir.
-              </p>
-              <button mat-raised-button color="warn" (click)="deleteAccount()">
-                Excluir Conta
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
   `,
   styles: [`
     .settings-container {
@@ -252,10 +253,17 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
       font-size: 1.25rem;
     }
 
-    .header-logo {
+    .ford-logo {
+      width: 40px;
       height: 40px;
-      width: auto;
-      max-width: 120px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: white;
+      font-size: 20px;
     }
 
     .navbar-nav {
@@ -549,14 +557,21 @@ export class SettingsComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.currentUser = user;
-      this.profileForm.patchValue({
-        name: user.name,
-        email: user.email
-      });
-    }
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        if (user) {
+          this.profileForm.patchValue({
+            name: user.name,
+            email: user.email
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+        this.showMessage('Error loading profile');
+      }
+    });
   }
 
   updateProfile(): void {
@@ -568,7 +583,7 @@ export class SettingsComponent implements OnInit {
           this.showMessage('Profile updated successfully');
           this.loadUserProfile();
         },
-        error: (error: any) => {
+        error: (error) => {
           console.error('Error updating profile:', error);
           this.showMessage('Error updating profile');
         }
@@ -588,7 +603,7 @@ export class SettingsComponent implements OnInit {
           this.showMessage('Password changed successfully');
           this.resetPasswordForm();
         },
-        error: (error: any) => {
+        error: (error) => {
           console.error('Error changing password:', error);
           this.showMessage('Error changing password');
         }
@@ -602,7 +617,16 @@ export class SettingsComponent implements OnInit {
 
   deleteAccount(): void {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      this.showMessage('Account deletion is not implemented yet');
+      this.userService.deleteAccount().subscribe({
+        next: () => {
+          this.showMessage('Account deleted successfully');
+          this.logout();
+        },
+        error: (error) => {
+          console.error('Error deleting account:', error);
+          this.showMessage('Error deleting account');
+        }
+      });
     }
   }
 

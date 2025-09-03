@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterRequest } from '../../../core/models/user.model';
@@ -21,74 +22,71 @@ import { RegisterRequest } from '../../../core/models/user.model';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatCheckboxModule,
     MatSnackBarModule
   ],
   template: `
-    <div class="auth-container">
-      <mat-card class="auth-card">
-        <mat-card-header class="auth-header">
-          <div class="ford-logo">
-            <h1>Ford</h1>
-          </div>
-          <mat-card-title>Crie sua conta</mat-card-title>
-          <mat-card-subtitle>Junte-se à nossa plataforma</mat-card-subtitle>
-        </mat-card-header>
-        
-        <mat-card-content>
-          <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Nome Completo</mat-label>
-              <input matInput type="text" formControlName="name" placeholder="Seu nome completo">
-              <mat-icon matSuffix>person</mat-icon>
-              <mat-error *ngIf="signupForm.get('name')?.hasError('required')">
-                Nome é obrigatório
-              </mat-error>
-              <mat-error *ngIf="signupForm.get('name')?.hasError('minlength')">
-                Nome deve ter pelo menos 2 caracteres
-              </mat-error>
-            </mat-form-field>
+    <div class="auth-container fade-in">
+      <mat-card class="auth-card fade-in-up">
+        <div class="auth-header">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="header-logo" />
+          <h1>Criar Conta</h1>
+          <p>Preencha os campos para se cadastrar</p>
+        </div>
 
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="seu@email.com">
-              <mat-icon matSuffix>email</mat-icon>
-              <mat-error *ngIf="signupForm.get('email')?.hasError('required')">
-                Email é obrigatório
-              </mat-error>
-              <mat-error *ngIf="signupForm.get('email')?.hasError('email')">
-                Email deve ter formato válido
-              </mat-error>
-            </mat-form-field>
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome completo</mat-label>
+            <input matInput formControlName="name" placeholder="Digite seu nome completo">
+            <mat-error *ngIf="isFieldInvalid('name')">
+              <span *ngIf="signupForm.get('name')?.errors?.['required']">O nome é obrigatório</span>
+              <span *ngIf="signupForm.get('name')?.errors?.['minlength']">O nome deve ter pelo menos 2 caracteres</span>
+            </mat-error>
+          </mat-form-field>
 
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Senha</mat-label>
-              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Sua senha">
-              <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="signupForm.get('password')?.hasError('required')">
-                Senha é obrigatória
-              </mat-error>
-              <mat-error *ngIf="signupForm.get('password')?.hasError('minlength')">
-                Senha deve ter pelo menos 8 caracteres
-              </mat-error>
-              <mat-error *ngIf="signupForm.get('password')?.hasError('pattern')">
-                Senha deve conter pelo menos: 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial
-              </mat-error>
-            </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>E-mail</mat-label>
+            <input matInput formControlName="email" placeholder="Digite seu e-mail">
+            <mat-error *ngIf="isFieldInvalid('email')">
+              <span *ngIf="signupForm.get('email')?.errors?.['required']">O e-mail é obrigatório</span>
+              <span *ngIf="signupForm.get('email')?.errors?.['email']">Insira um e-mail válido</span>
+            </mat-error>
+          </mat-form-field>
 
-            <button mat-raised-button color="primary" type="submit" 
-                    [disabled]="signupForm.invalid || isLoading" class="full-width auth-button">
-              {{isLoading ? 'Criando conta...' : 'Criar Conta'}}
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Senha</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Crie uma senha forte">
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+              <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
             </button>
-          </form>
-        </mat-card-content>
+            <mat-error *ngIf="isFieldInvalid('password')">
+              <span *ngIf="signupForm.get('password')?.errors?.['required']">A senha é obrigatória</span>
+              <span *ngIf="signupForm.get('password')?.errors?.['minlength']">A senha deve ter no mínimo 8 caracteres</span>
+              <span *ngIf="signupForm.get('password')?.errors?.['pattern']">A senha deve conter letras maiúsculas, minúsculas, número e caractere especial</span>
+            </mat-error>
+          </mat-form-field>
 
-        <mat-card-actions class="auth-actions">
-          <p>Já tem uma conta? 
-            <a routerLink="/auth/signin" class="auth-link">Entre aqui</a>
-          </p>
-        </mat-card-actions>
+          <div class="password-strength">
+            <div class="strength-bar" [class]="getPasswordStrength()"></div>
+            <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+          </div>
+
+          <mat-checkbox formControlName="acceptTerms" color="primary">
+            Eu aceito os <a href="#" class="terms-link">Termos e Condições</a>
+          </mat-checkbox>
+          <mat-error *ngIf="isFieldInvalid('acceptTerms')">
+            Você deve aceitar os termos
+          </mat-error>
+
+          <button mat-raised-button color="primary" class="btn-full" [disabled]="signupForm.invalid || isLoading">
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Criando conta...' : 'Criar Conta' }}
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Já tem uma conta? <a routerLink="/auth/signin">Entrar</a></p>
+        </div>
       </mat-card>
     </div>
   `,
@@ -98,79 +96,112 @@ import { RegisterRequest } from '../../../core/models/user.model';
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--ford-blue) 0%, var(--ford-blue-light) 100%);
+      background: #fff;
+      padding: 1rem;
     }
 
     .auth-card {
+      max-width: 420px;
       width: 100%;
-      max-width: 400px;
-      padding: 0;
+      padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      background: white;
     }
 
     .auth-header {
-      background: var(--ford-blue);
-      color: var(--ford-white);
-      padding: 24px;
-      margin: -16px -16px 16px -16px;
-      border-radius: 4px 4px 0 0;
+      text-align: center;
+      margin-bottom: 1.5rem;
     }
 
-    .ford-logo h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-      letter-spacing: 2px;
+    .header-logo {
+      height: 70px;
+      width: auto;
+      max-width: 200px;
+      margin: 0 auto 1rem;
+      display: block;
     }
 
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    h1 {
+      font-size: 1.8rem;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 0.95rem;
     }
 
     .full-width {
       width: 100%;
+      margin-bottom: 1rem;
     }
 
-    .auth-button {
-      height: 48px;
-      font-size: 16px;
-      font-weight: 500;
-      margin-top: 8px;
+    .password-strength {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1rem;
     }
 
-    .auth-actions {
-      text-align: center;
-      padding: 16px 24px;
-      background: var(--ford-gray-light);
-      margin: 16px -16px -16px -16px;
-      border-radius: 0 0 4px 4px;
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: 4px;
+      background: #e2e8f0;
     }
 
-    .auth-actions p {
-      margin: 0;
-      color: var(--ford-gray-dark);
+    .strength-bar.weak { background: #ef4444; }
+    .strength-bar.fair { background: #f59e0b; }
+    .strength-bar.good { background: #3b82f6; }
+    .strength-bar.strong { background: #10b981; }
+
+    .strength-text {
+      font-size: 12px;
+      color: #64748b;
     }
 
-    .auth-link {
-      color: var(--ford-blue);
+    .terms-link {
+      color: #003478;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
     }
 
-    .auth-link:hover {
+    .btn-full {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .auth-footer a {
+      color: #003478;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-footer a:hover {
       text-decoration: underline;
     }
 
-    @media (max-width: 480px) {
-      .auth-container {
-        padding: 16px;
-      }
-      
-      .auth-card {
-        margin: 0;
-      }
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    .fade-in-up { animation: fadeInUp 0.6s ease-in; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   `]
 })
@@ -191,25 +222,61 @@ export class SignupComponent {
       password: ['', [
         Validators.required,
         Validators.minLength(8),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&].*$/)
-      ]]
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).*$/)
+      ]],
+      acceptTerms: [false, [Validators.requiredTrue]]
     });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.signupForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getPasswordStrength(): string {
+    const password = this.signupForm.get('password')?.value || '';
+    if (!password) return '';
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[@$!%*?&]/.test(password)) score++;
+    if (score <= 2) return 'weak';
+    if (score === 3) return 'fair';
+    if (score === 4) return 'good';
+    return 'strong';
+  }
+
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    switch (strength) {
+      case 'weak': return 'Fraca';
+      case 'fair': return 'Média';
+      case 'good': return 'Boa';
+      case 'strong': return 'Forte';
+      default: return '';
+    }
   }
 
   onSubmit(): void {
     if (this.signupForm.valid) {
       this.isLoading = true;
-      const registerRequest: RegisterRequest = this.signupForm.value;
+      const registerRequest: RegisterRequest = {
+        name: this.signupForm.value.name,
+        email: this.signupForm.value.email,
+        password: this.signupForm.value.password
+      };
 
       this.authService.register(registerRequest).subscribe({
-        next: (response) => {
+        next: () => {
           this.snackBar.open('Conta criada com sucesso! Faça login para continuar.', 'Fechar', {
             duration: 5000,
             panelClass: ['success-snackbar']
           });
           this.router.navigate(['/auth/signin']);
         },
-        error: (error) => {
+        error: (error: any) => {
           this.isLoading = false;
           const message = error.error?.message || 'Erro ao criar conta. Tente novamente.';
           this.snackBar.open(message, 'Fechar', {
@@ -217,6 +284,10 @@ export class SignupComponent {
             panelClass: ['error-snackbar']
           });
         }
+      });
+    } else {
+      Object.keys(this.signupForm.controls).forEach(key => {
+        this.signupForm.get(key)?.markAsTouched();
       });
     }
   }
