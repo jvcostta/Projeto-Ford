@@ -1,0 +1,142 @@
+/* Ford Theme Colors */
+:root {
+  --ford-blue: #003366;
+  --ford-blue-light: #004080;
+  --ford-blue-dark: #002244;
+  --ford-white: #ffffff;
+  --ford-gray-light: #f5f5f5;
+  --ford-gray: #e0e0e0;
+  --ford-gray-dark: #666666;
+  --ford-success: #4caf50;
+  --ford-warning: #ff9800;
+  --ford-error: #f44336;
+}
+
+/* Global Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--ford-gray-light);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Material Theme Customization */
+.mat-mdc-button {
+  &.mat-primary {
+    --mdc-filled-button-container-color: var(--ford-blue);
+    --mdc-filled-button-label-text-color: var(--ford-white);
+    
+    &:hover {
+      --mdc-filled-button-container-color: var(--ford-blue-light);
+    }
+  }
+}
+
+.mat-mdc-form-field {
+  &.mat-primary {
+    --mdc-filled-text-field-focus-active-indicator-color: var(--ford-blue);
+    --mdc-filled-text-field-focus-label-text-color: var(--ford-blue);
+  }
+}
+
+/* Custom Classes */
+.ford-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.ford-card {
+  background: var(--ford-white);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.ford-header {
+  background: var(--ford-blue);
+  color: var(--ford-white);
+  padding: 16px 24px;
+  border-radius: 8px 8px 0 0;
+}
+
+.ford-button {
+  background-color: var(--ford-blue);
+  color: var(--ford-white);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: var(--ford-blue-light);
+  }
+  
+  &:disabled {
+    background-color: var(--ford-gray);
+    cursor: not-allowed;
+  }
+}
+
+.ford-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--ford-gray);
+  border-radius: 4px;
+  font-size: 14px;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--ford-blue);
+    box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.2);
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ford-container {
+    padding: 16px;
+  }
+  
+  .ford-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+}
