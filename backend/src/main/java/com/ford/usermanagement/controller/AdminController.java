@@ -23,7 +23,7 @@ public class AdminController {
         try {
             User admin = userRepository.findByEmail("admin@ford.com").orElse(null);
             if (admin != null) {
-                admin.setPassword(passwordEncoder.encode("admin123"));
+                admin.setPassword(passwordEncoder.encode("NewPass123!"));
                 userRepository.save(admin);
                 return ResponseEntity.ok("Password reset successfully");
             }
