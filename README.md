@@ -225,6 +225,8 @@ POST /api/auth/register
 - **Email**: admin@ford.com
 - **Senha**: NewPass123!
 
+*Nota: Estes usuários são criados automaticamente na inicialização da aplicação*
+
 ## 🧪 Executando Testes
 
 ### Backend (Spring Boot)
@@ -366,7 +368,7 @@ O projeto utiliza as seguintes variáveis de ambiente principais:
 
 ## 🎥 Video Demo
 
-[Link para o video demo será adicionado aqui]
+[Link para o video](https://youtu.be/J6S0d8lIUlU)
 
 O video demonstra:
 
