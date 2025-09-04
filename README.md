@@ -98,12 +98,14 @@ MYSQL_PORT=3306
 
 ### 3. Executar a Aplicação Completa
 ```bash
-# Subir todos os serviços (Backend, Frontend e MySQL)
-docker-compose up -d
+# Construir e subir todos os serviços (Backend, Frontend e MySQL)
+docker-compose up --build -d
 
 # Verificar logs (opcional)
 docker-compose logs -f
 ```
+
+> **⚠️ Importante**: Use `--build` na primeira execução ou quando houver mudanças no código para garantir que as imagens sejam reconstruídas corretamente.
 
 ### 4. Acessar a Aplicação
 - **Frontend**: http://localhost:4200
@@ -112,6 +114,62 @@ docker-compose logs -f
 ### 5. Parar a Aplicação
 ```bash
 docker-compose down
+```
+
+## 🔧 Troubleshooting
+
+### Problemas Comuns de Instalação
+
+#### 🐳 Erro: "unable to get image"
+Se você receber erro do tipo `unable to get image 'projeto-ford-frontend'` ou similar:
+
+```bash
+# Use o comando com --build para construir as imagens localmente
+docker-compose up --build -d
+```
+
+#### 🚫 Porta Ocupada
+Se alguma porta estiver ocupada (3306, 8080, 4200):
+
+```bash
+# Verificar processos nas portas
+netstat -ano | findstr :3306
+netstat -ano | findstr :8080
+netstat -ano | findstr :4200
+
+# Parar containers existentes
+docker-compose down
+```
+
+#### 🗄️ Problemas com MySQL
+Se o MySQL não inicializar corretamente:
+
+```bash
+# Remover volumes e reiniciar
+docker-compose down -v
+docker-compose up --build -d
+```
+
+#### 🔄 Cache de Node/Angular
+Se o frontend não atualizar:
+
+```bash
+# Limpar cache e rebuildar
+docker-compose down
+docker system prune -f
+docker-compose up --build -d
+```
+
+### Verificação de Funcionamento
+
+```bash
+# Verificar status dos containers
+docker-compose ps
+
+# Verificar logs
+docker-compose logs backend
+docker-compose logs frontend
+docker-compose logs mysql
 ```
 
 ## 🔍 Endpoints Principais
@@ -165,13 +223,7 @@ POST /api/auth/register
 
 ### Usuário Administrador
 - **Email**: admin@ford.com
-- **Senha**: admin123
-
-### Usuário Comum
-- **Email**: user@ford.com
-- **Senha**: user123
-
-*Nota: Estes usuários são criados automaticamente na inicialização da aplicação*
+- **Senha**: NewPass123!
 
 ## 🧪 Executando Testes
 
@@ -266,12 +318,7 @@ Para testar a aplicação, use as seguintes credenciais pré-configuradas:
 **Administrador:**
 
 - **Email**: admin[at]ford.com
-- **Senha**: admin123
-
-**Usuário de Teste:**
-
-- **Email**: user[at]ford.com
-- **Senha**: user123
+- **Senha**: NewPass123!
 
 > **Nota**: As senhas são criptografadas com BCrypt e armazenadas de forma segura no banco de dados.
 

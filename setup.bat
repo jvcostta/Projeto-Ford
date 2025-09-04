@@ -45,8 +45,7 @@ if %errorlevel% equ 0 (
     echo    Swagger UI: http://localhost:8080/swagger-ui.html
     echo.
     echo 👤 Test Credentials:
-    echo    Admin: admin@ford.com / Admin@123
-    echo    User: user@ford.com / User@123
+    echo    Admin: admin@ford.com / NewPass123!
     echo.
     echo 🔍 To view logs: docker-compose logs -f
     echo 🛑 To stop: docker-compose down

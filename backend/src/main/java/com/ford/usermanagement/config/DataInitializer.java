@@ -35,22 +35,14 @@ public class DataInitializer {
             createUserIfNotExists(
                 "Administrador Ford",
                 "admin@ford.com", 
-                "admin123",
+                "NewPass123!",
                 "Usuário administrador criado automaticamente para testes"
             );
             
-            // Criar usuário comum
-            createUserIfNotExists(
-                "Usuário Ford",
-                "user@ford.com", 
-                "user123",
-                "Usuário comum criado automaticamente para testes"
-            );
             
             log.info("✅ Configuração de dados padrão concluída!");
             log.info("📋 Credenciais disponíveis:");
-            log.info("   👤 Admin: admin@ford.com / admin123");
-            log.info("   👤 User:  user@ford.com / user123");
+            log.info("   👤 Admin: admin@ford.com / NewPass123!");
         };
     }
 
