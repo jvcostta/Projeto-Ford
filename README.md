@@ -368,7 +368,7 @@ O projeto utiliza as seguintes variáveis de ambiente principais:
 
 ## 🎥 Video Demo
 
-[Link para o video](https://youtu.be/J6S0d8lIUlU)
+[Link para o video](https://youtu.be/ehlxj3sDJOw)
 
 O video demonstra:
 
