@@ -165,11 +165,11 @@ POST /api/auth/register
 
 ### Usuário Administrador
 - **Email**: admin@ford.com
-- **Senha**: Admin@123
+- **Senha**: admin123
 
 ### Usuário Comum
 - **Email**: user@ford.com
-- **Senha**: User@123
+- **Senha**: user123
 
 *Nota: Estes usuários são criados automaticamente na inicialização da aplicação*
 
