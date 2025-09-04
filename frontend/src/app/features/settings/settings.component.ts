@@ -205,16 +205,6 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
                 Salvar Preferências
               </button>
             </div>
-
-            <div class="danger-zone">
-              <h3 class="danger-title">Zona de Risco</h3>
-              <p class="danger-description">
-                Ao excluir sua conta, não será possível recuperar os dados. Tenha certeza antes de prosseguir.
-              </p>
-              <button mat-raised-button color="warn" (click)="deleteAccount()">
-                Excluir Conta
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -442,27 +432,6 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
       color: #64748b;
     }
 
-    .danger-zone {
-      border: 1px solid #fecaca;
-      background: #fef2f2;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .danger-title {
-      color: #dc2626;
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin: 0 0 1rem 0;
-    }
-
-    .danger-description {
-      color: #991b1b;
-      margin: 0 0 1rem 0;
-      font-size: 14px;
-    }
-
     @media (max-width: 768px) {
       .content-grid {
         grid-template-columns: 1fr;
@@ -598,12 +567,6 @@ export class SettingsComponent implements OnInit {
 
   savePreferences(): void {
     this.showMessage('Preferences saved successfully');
-  }
-
-  deleteAccount(): void {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      this.showMessage('Account deletion is not implemented yet');
-    }
   }
 
   resetProfileForm(): void {

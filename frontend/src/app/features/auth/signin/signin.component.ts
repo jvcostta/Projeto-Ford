@@ -26,13 +26,13 @@ import { LoginRequest } from '../../../core/models/user.model';
     MatSnackBarModule
   ],
 template: `
-  <div class="auth-page">
-    <div class="auth-card">
-      <div class="auth-logo">
-        <img src="assets/images/ford-logo.svg" alt="Ford Logo" class="header-logo" />
+  <div class="auth-container">
+    <mat-card class="auth-card">
+      <div class="auth-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="header-logo" />
+        <h1>Bem-vindo de volta</h1>
+        <p>Acesse o portal da Ford</p>
       </div>
-      <h1 class="auth-title">Bem-vindo de volta</h1>
-      <p class="auth-subtitle">Acesse o portal da Ford</p>
 
       <form [formGroup]="signinForm" (ngSubmit)="onSubmit()" class="auth-form">
         <mat-form-field appearance="outline" class="full-width">
@@ -66,54 +66,52 @@ template: `
       <p class="signup-text">Não tem uma conta? 
         <a routerLink="/auth/signup" class="signup-link">Criar conta</a>
       </p>
-    </div>
+    </mat-card>
   </div>
 `,
 
 styles: [`
-  .auth-page {
+  .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #003478 0%, #1766a6 100%);
+    min-height: 100vh;
+    background: #fff;
     padding: 1rem;
   }
 
-    .header-logo {
-      height: 70px;
-      width: auto;
-      max-width: 200px;
-      margin: 0 auto 1rem;
-      display: block;
-    }
-
   .auth-card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 2.5rem;
-    border-radius: 16px;
-    width: 100%;
     max-width: 420px;
+    width: 100%;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    background: white;
+  }
+
+  .auth-header {
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
   }
 
-  .auth-logo img {
-    width: 90px;
-    margin-bottom: 1rem;
+  .header-logo {
+    height: 70px;
+    width: auto;
+    max-width: 200px;
+    margin: 0 auto 1rem;
+    display: block;
   }
 
-  .auth-title {
-    font-size: 2rem;
+  h1 {
+    font-size: 1.8rem;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
     font-weight: 700;
-    color: #003478;
-    margin-bottom: 0.5rem;
   }
 
-  .auth-subtitle {
-    font-size: 1rem;
+  p {
     color: #64748b;
+    font-size: 0.95rem;
     margin-bottom: 1.5rem;
   }
 
@@ -126,6 +124,7 @@ styles: [`
 
   .full-width {
     width: 100%;
+    margin-bottom: 1rem;
   }
 
   .options {
