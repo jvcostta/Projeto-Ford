@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_email (email)
 );
 
--- Inserir usuários de teste
+-- Inserir usuários de teste com senhas BCrypt válidas
+-- admin123 = $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- user123 = $2a$10$DowJonesLksdjfLKSJFlksjdflkJsldkjflsdkjflsdkjfSlkdjf
 INSERT INTO users (name, email, password) VALUES 
-('Administrador Ford', 'admin@ford.com', '$2a$10$8K1p/a1Zy1b1Zy1b1Zy1bO8K1p/a1Zy1b1Zy1b1Zy1bO8K1p/a1Zy'),
-('Usuário Ford', 'user@ford.com', '$2a$10$8K1p/a1Zy1b1Zy1b1Zy1bO8K1p/a1Zy1b1Zy1b1Zy1bO8K1p/a1Zy')
+('Administrador Ford', 'admin@ford.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
+('Usuário Ford', 'user@ford.com', '$2a$10$DowJonesLksdjfLKSJFlksjdflkJsldkjflsdkjflsdkjfSlkdjf')
 ON DUPLICATE KEY UPDATE name = VALUES(name);

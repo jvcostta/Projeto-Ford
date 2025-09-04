@@ -1,20 +1,22 @@
 # Ford User Management Platform
 
-Uma aplicação web moderna e completa para gerenciamento de usuários, desenvolvida especificamente para o processo seletivo da Ford. A aplicação oferece funcionalidades de cadastro, autenticação e atualização de perfil com design inspirado na identidade visual da Ford.
+Uma aplicação web moderna e completa para gerenciamento de usuários, desenvolvida especificamente para o processo seletivo da IEL em parceria com a Ford. A aplicação oferece funcionalidades de cadastro, autenticação e gerenciamento de perfil com design inspirado na identidade visual oficial da Ford.
 
 ## 🎯 Visão da Solução
 
 Esta aplicação implementa um sistema completo de gerenciamento de usuários com três telas principais:
-- **Sign Up**: Cadastro de novos usuários
-- **Sign In**: Autenticação de usuários
-- **Settings**: Atualização de dados do perfil
+- **Sign Up**: Cadastro de novos usuários com validação de força da senha
+- **Sign In**: Autenticação de usuários com design moderno
+- **Settings**: Gerenciamento de perfil, segurança e preferências do usuário
 
 A solução foi construída com foco em:
-- Experiência do usuário intuitiva e responsiva
-- Código limpo e bem estruturado
+- Experiência do usuário intuitiva e totalmente responsiva
+- Design moderno com logo oficial da Ford
+- Código limpo e bem estruturado seguindo best practices
 - Arquitetura escalável e manutenível
-- Segurança robusta com JWT
+- Segurança robusta com JWT e BCrypt
 - Facilidade de execução com Docker
+- Interface traduzida para português brasileiro
 
 ## 🏗️ Arquitetura
 
@@ -105,8 +107,7 @@ docker-compose logs -f
 
 ### 4. Acessar a Aplicação
 - **Frontend**: http://localhost:4200
-- **Backend API**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
+
 
 ### 5. Parar a Aplicação
 ```bash
@@ -192,24 +193,61 @@ npm test
 docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 ```
 
-## 📱 Design e Tema Ford
+## 📱 Design e Interface
 
-A aplicação segue a identidade visual da Ford:
-- **Cores Primárias**: Azul Ford (#003366) e Branco
-- **Tipografia**: Roboto (clean e profissional)
-- **Layout**: Design moderno e responsivo
-- **Componentes**: Angular Material customizado com tema Ford
-- **Acessibilidade**: Padrões WCAG 2.1 seguidos
+A aplicação apresenta um design moderno e profissional seguindo a identidade visual da Ford:
+
+### 🎨 Características Visuais
+
+- **Logo Oficial**: Logo da Ford do Wikimedia integrada em todas as telas
+- **Cores Ford**: Azul primário (#003478), azul secundário (#1766a6) e branco
+- **Design Consistente**: Fundo branco com elementos em azul para todas as telas de autenticação
+- **Tipografia**: Roboto - limpa e profissional
+- **Layout Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
+- **Componentes Modernos**: Angular Material customizado com tema Ford
+- **Animações Suaves**: Transições e feedback visual elegantes
+
+### 📱 Telas Implementadas
+
+#### **Tela de Login (Sign In)**
+
+- Design clean com fundo branco
+- Logo oficial da Ford centralizada
+- Formulário de login com validação em tempo real
+- Opção "Lembrar de mim" e "Esqueci minha senha"
+- Botão de toggle para mostrar/ocultar senha
+- Link para cadastro integrado
+
+#### **Tela de Cadastro (Sign Up)**
+
+- Interface consistente com o login
+- Indicador visual de força da senha em tempo real
+- Validação completa de formulário
+- Checkbox para aceitar termos de uso
+- Seção de recursos do sistema
+- Design totalmente responsivo
+
+#### **Tela de Configurações (Settings)**
+
+- Navegação moderna com logo da Ford no header
+- Interface em abas para melhor organização:
+  - **Perfil**: Edição de nome e email
+  - **Segurança**: Alteração de senha com validação
+  - **Preferências**: Configurações de notificações
+- Design responsivo com sidebar adaptativa
+- Feedback visual para ações do usuário
 
 ## 🔄 Trade-offs e Considerações
 
-### Escolhas de Arquitetura:
+### Escolhas de Arquitetura
+
 - **Monorepo vs Multi-repo**: Escolhido monorepo para simplicidade de avaliação
 - **JWT vs Sessions**: JWT para stateless e escalabilidade
 - **MySQL vs PostgreSQL**: MySQL por familiaridade e simplicidade
 - **Docker vs Instalação Manual**: Docker para consistência entre ambientes
 
-### Limitações Intencionais:
+### Limitações Intencionais
+
 - Sem microserviços (desnecessário para o escopo)
 - Sem cache Redis (otimização prematura)
 - Sem CI/CD complexo (foco na aplicação)
@@ -221,11 +259,70 @@ A aplicação segue a identidade visual da Ford:
 - **Vulnerabilidades**: 0 dependências vulneráveis
 - **Performance**: Lighthouse Score >90
 
+## 🔐 Credenciais de Acesso
+
+Para testar a aplicação, use as seguintes credenciais pré-configuradas:
+
+**Administrador:**
+
+- **Email**: admin[at]ford.com
+- **Senha**: admin123
+
+**Usuário de Teste:**
+
+- **Email**: user[at]ford.com
+- **Senha**: user123
+
+> **Nota**: As senhas são criptografadas com BCrypt e armazenadas de forma segura no banco de dados.
+
+## ⚙️ Configurações Adicionais
+
+### Configuração de Desenvolvimento
+
+Para executar o projeto em modo de desenvolvimento:
+
+**Backend (Spring Boot):**
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+**Frontend (Angular):**
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+**Banco de Dados (MySQL):**
+
+```bash
+docker run --name mysql-ford -e MYSQL_ROOT_PASSWORD=root123 -e MYSQL_DATABASE=ford_project -p 3306:3306 -d mysql:8.0
+```
+
+### Variáveis de Ambiente
+
+O projeto utiliza as seguintes variáveis de ambiente principais:
+
+**Backend:**
+
+- `SPRING_DATASOURCE_URL`: URL de conexão com o banco de dados
+- `SPRING_DATASOURCE_USERNAME`: Usuário do banco de dados
+- `SPRING_DATASOURCE_PASSWORD`: Senha do banco de dados
+- `JWT_SECRET`: Chave secreta para geração de tokens JWT
+
+**Frontend:**
+
+- `API_BASE_URL`: URL base da API do backend
+
 ## 🎥 Video Demo
 
 [Link para o video demo será adicionado aqui]
 
 O video demonstra:
+
 1. Acesso à aplicação
 2. Cadastro de novo usuário
 3. Login com usuário criado
@@ -243,4 +340,4 @@ Este projeto é privado e destinado exclusivamente para avaliação no processo 
 
 ---
 
-**Desenvolvido com ❤️ para a Ford** | João Victor Costa
+**Desenvolvido para a IEL em parceria  com a Ford** | João Victor Costa

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
@@ -19,263 +20,466 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatCardModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatTabsModule,
     MatToolbarModule,
+    MatSlideToggleModule,
     MatSnackBarModule
   ],
   template: `
     <div class="settings-container">
-      <mat-toolbar class="settings-toolbar">
-        <div class="toolbar-content">
-          <div class="ford-logo">
-            <h2>Ford</h2>
-          </div>
-          <span class="spacer"></span>
-          <button mat-button (click)="logout()" class="logout-button">
-            <mat-icon>logout</mat-icon>
-            Sair
-          </button>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="header-logo">
+        <span>Ford Recruitment</span>
+      </div>
+      
+      <div class="navbar-nav">
+        <div class="nav-profile">
+          <div class="profile-avatar">{{ getUserInitials() }}</div>
+          <span class="profile-name">{{ currentUser?.name }}</span>
         </div>
-      </mat-toolbar>
-
-      <div class="settings-content">
-        <div class="welcome-section">
-          <h1>Configurações da Conta</h1>
-          <p>Bem-vindo(a), <strong>{{currentUser?.name}}</strong>!</p>
-        </div>
-
-        <mat-tab-group class="settings-tabs">
-          <mat-tab label="Perfil">
-            <div class="tab-content">
-              <mat-card>
-                <mat-card-header>
-                  <mat-card-title>Informações do Perfil</mat-card-title>
-                  <mat-card-subtitle>Atualize suas informações pessoais</mat-card-subtitle>
-                </mat-card-header>
-                
-                <mat-card-content>
-                  <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
-                    <mat-form-field appearance="fill" class="full-width">
-                      <mat-label>Nome Completo</mat-label>
-                      <input matInput type="text" formControlName="name" placeholder="Seu nome completo">
-                      <mat-icon matSuffix>person</mat-icon>
-                      <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
-                        Nome é obrigatório
-                      </mat-error>
-                      <mat-error *ngIf="profileForm.get('name')?.hasError('minlength')">
-                        Nome deve ter pelo menos 2 caracteres
-                      </mat-error>
-                    </mat-form-field>
-
-                    <mat-form-field appearance="fill" class="full-width">
-                      <mat-label>Email</mat-label>
-                      <input matInput type="email" formControlName="email" placeholder="seu@email.com">
-                      <mat-icon matSuffix>email</mat-icon>
-                      <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
-                        Email é obrigatório
-                      </mat-error>
-                      <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
-                        Email deve ter formato válido
-                      </mat-error>
-                    </mat-form-field>
-
-                    <div class="form-actions">
-                      <button mat-raised-button color="primary" type="submit" 
-                              [disabled]="profileForm.invalid || isProfileLoading">
-                        {{isProfileLoading ? 'Salvando...' : 'Salvar Alterações'}}
-                      </button>
-                    </div>
-                  </form>
-                </mat-card-content>
-              </mat-card>
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Senha">
-            <div class="tab-content">
-              <mat-card>
-                <mat-card-header>
-                  <mat-card-title>Alterar Senha</mat-card-title>
-                  <mat-card-subtitle>Mantenha sua conta segura</mat-card-subtitle>
-                </mat-card-header>
-                
-                <mat-card-content>
-                  <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
-                    <mat-form-field appearance="fill" class="full-width">
-                      <mat-label>Senha Atual</mat-label>
-                      <input matInput [type]="hideCurrentPassword ? 'password' : 'text'" 
-                             formControlName="currentPassword" placeholder="Sua senha atual">
-                      <button mat-icon-button matSuffix (click)="hideCurrentPassword = !hideCurrentPassword" type="button">
-                        <mat-icon>{{hideCurrentPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                      </button>
-                      <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
-                        Senha atual é obrigatória
-                      </mat-error>
-                    </mat-form-field>
-
-                    <mat-form-field appearance="fill" class="full-width">
-                      <mat-label>Nova Senha</mat-label>
-                      <input matInput [type]="hideNewPassword ? 'password' : 'text'" 
-                             formControlName="newPassword" placeholder="Sua nova senha">
-                      <button mat-icon-button matSuffix (click)="hideNewPassword = !hideNewPassword" type="button">
-                        <mat-icon>{{hideNewPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                      </button>
-                      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
-                        Nova senha é obrigatória
-                      </mat-error>
-                      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
-                        Nova senha deve ter pelo menos 8 caracteres
-                      </mat-error>
-                      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('pattern')">
-                        Nova senha deve conter pelo menos: 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial
-                      </mat-error>
-                    </mat-form-field>
-
-                    <div class="form-actions">
-                      <button mat-raised-button color="primary" type="submit" 
-                              [disabled]="passwordForm.invalid || isPasswordLoading">
-                        {{isPasswordLoading ? 'Alterando...' : 'Alterar Senha'}}
-                      </button>
-                    </div>
-                  </form>
-                </mat-card-content>
-              </mat-card>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+        <button class="nav-link logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Sair
+        </button>
       </div>
     </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="container">
+      <div class="welcome-section">
+        <div class="welcome-content">
+          <h1>Configurações da Conta</h1>
+          <p>Gerencie seu perfil e preferências da conta</p>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="sidebar">
+          <div class="nav-card">
+            <ul class="nav-menu">
+              <li class="nav-item">
+                <a class="nav-link" (click)="activeTab = 0" [class.active]="activeTab === 0">
+                  <mat-icon class="nav-icon">person</mat-icon>
+                  Perfil
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" (click)="activeTab = 1" [class.active]="activeTab === 1">
+                  <mat-icon class="nav-icon">lock</mat-icon>
+                  Segurança
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" (click)="activeTab = 2" [class.active]="activeTab === 2">
+                  <mat-icon class="nav-icon">settings</mat-icon>
+                  Preferências
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div *ngIf="activeTab === 0">
+            <h2 class="section-title">Informações Pessoais</h2>
+            <form [formGroup]="profileForm" class="form-grid">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Nome Completo</mat-label>
+                  <input matInput formControlName="name" placeholder="Digite seu nome completo">
+                  <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
+                    Nome é obrigatório
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>E-mail</mat-label>
+                  <input matInput formControlName="email" placeholder="Digite seu e-mail">
+                  <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+                    E-mail é obrigatório
+                  </mat-error>
+                  <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                    Digite um e-mail válido
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-actions">
+                <button mat-stroked-button type="button" (click)="resetProfileForm()">
+                  Cancelar
+                </button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  type="button"
+                  [disabled]="profileForm.invalid"
+                  (click)="updateProfile()">
+                  Salvar Alterações
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="activeTab === 1">
+            <h2 class="section-title">Alterar Senha</h2>
+            <form [formGroup]="passwordForm" class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Senha Atual</mat-label>
+                <input matInput type="password" formControlName="currentPassword">
+                <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+                  Senha atual é obrigatória
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nova Senha</mat-label>
+                <input matInput type="password" formControlName="newPassword">
+                <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+                  Nova senha é obrigatória
+                </mat-error>
+                <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                  A senha deve ter no mínimo 6 caracteres
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirmar Nova Senha</mat-label>
+                <input matInput type="password" formControlName="confirmPassword">
+                <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+                  Confirme sua nova senha
+                </mat-error>
+                <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+                  As senhas não coincidem
+                </mat-error>
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-stroked-button type="button" (click)="resetPasswordForm()">
+                  Cancelar
+                </button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  type="button"
+                  [disabled]="passwordForm.invalid"
+                  (click)="changePassword()">
+                  Atualizar Senha
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="activeTab === 2">
+            <h2 class="section-title">Preferências</h2>
+            
+            <div class="preference-item">
+              <div class="preference-info">
+                <h4>Notificações por E-mail</h4>
+                <p>Receber atualizações sobre suas candidaturas</p>
+              </div>
+              <mat-slide-toggle [(ngModel)]="preferences.emailNotifications"></mat-slide-toggle>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <h4>Alertas de Vagas</h4>
+                <p>Receba notificações sobre novas oportunidades de emprego</p>
+              </div>
+              <mat-slide-toggle [(ngModel)]="preferences.jobAlerts"></mat-slide-toggle>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="button"
+                (click)="savePreferences()">
+                Salvar Preferências
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
   `,
   styles: [`
     .settings-container {
       min-height: 100vh;
-      background-color: var(--ford-gray-light);
+      background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
     }
 
-    .settings-toolbar {
-      background-color: var(--ford-blue);
-      color: var(--ford-white);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    .navbar {
+      background: linear-gradient(135deg, #003478 0%, #1766a6 100%);
+      padding: 1rem 0;
     }
 
-    .toolbar-content {
-      display: flex;
-      align-items: center;
-      width: 100%;
+    .navbar-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 16px;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .ford-logo h2 {
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: 1px;
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
     }
 
-    .spacer {
-      flex: 1;
+    .header-logo {
+      height: 40px;
+      width: auto;
+      max-width: 120px;
     }
 
-    .logout-button {
-      color: var(--ford-white);
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .settings-content {
-      max-width: 800px;
+    .nav-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: white;
+    }
+
+    .profile-avatar {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .profile-name {
+      font-weight: 500;
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-weight: 500;
+    }
+
+    .main-content {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 24px 16px;
+      padding: 2rem;
     }
 
     .welcome-section {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 3rem;
     }
 
-    .welcome-section h1 {
-      color: var(--ford-blue);
-      margin-bottom: 8px;
+    .welcome-content h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
     }
 
-    .welcome-section p {
-      color: var(--ford-gray-dark);
+    .welcome-content p {
+      font-size: 1.125rem;
+      color: #64748b;
       margin: 0;
     }
 
-    .settings-tabs {
-      background: var(--ford-white);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .content-grid {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 3rem;
+      align-items: start;
     }
 
-    .tab-content {
-      padding: 24px;
+    .sidebar {
+      position: sticky;
+      top: 2rem;
     }
 
-    .profile-form,
-    .password-form {
+    .nav-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #64748b;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
     }
 
-    .full-width {
-      width: 100%;
+    .nav-link:hover {
+      background: #f1f5f9;
+      color: #003478;
+    }
+
+    .nav-link.active {
+      background: #003478;
+      color: white;
+    }
+
+    .nav-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+
+    .content-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 2rem 0;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
     }
 
     .form-actions {
       display: flex;
+      gap: 1rem;
       justify-content: flex-end;
-      margin-top: 16px;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e2e8f0;
     }
 
-    .form-actions button {
-      min-width: 150px;
-    }
-
-    mat-card {
+    .preference-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      box-shadow: none;
-      border: 1px solid var(--ford-gray);
+      margin-bottom: 1rem;
     }
 
-    mat-card-header {
-      background: var(--ford-gray-light);
-      margin: -16px -16px 16px -16px;
-      padding: 16px;
+    .preference-info h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e293b;
     }
 
-    mat-card-title {
-      color: var(--ford-blue);
-      font-weight: 500;
-    }
-
-    mat-card-subtitle {
-      color: var(--ford-gray-dark);
+    .preference-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
     }
 
     @media (max-width: 768px) {
-      .settings-content {
-        padding: 16px;
+      .content-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
       }
-      
-      .tab-content {
-        padding: 16px;
+
+      .sidebar {
+        position: static;
       }
-      
+
+      .nav-menu {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+
+      .nav-item {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
       .form-actions {
-        justify-content: stretch;
+        flex-direction: column;
       }
-      
-      .form-actions button {
-        width: 100%;
+
+      .navbar-container {
+        padding: 0 1rem;
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .welcome-content h1 {
+        font-size: 1.875rem;
+      }
+
+      .welcome-content p {
+        font-size: 1rem;
+      }
+
+      .content-card {
+        padding: 1.5rem;
       }
     }
   `]
@@ -284,10 +488,11 @@ export class SettingsComponent implements OnInit {
   currentUser: User | null = null;
   profileForm: FormGroup;
   passwordForm: FormGroup;
-  hideCurrentPassword = true;
-  hideNewPassword = true;
-  isProfileLoading = false;
-  isPasswordLoading = false;
+  activeTab = 0;
+  preferences = {
+    emailNotifications: true,
+    jobAlerts: true
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -297,73 +502,44 @@ export class SettingsComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.profileForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]]
     });
 
     this.passwordForm = this.fb.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&].*$/)
-      ]]
-    });
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
   }
 
   ngOnInit(): void {
     this.loadUserProfile();
-    
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      if (user) {
-        this.profileForm.patchValue({
-          name: user.name,
-          email: user.email
-        });
-      }
-    });
   }
 
   loadUserProfile(): void {
-    this.userService.getProfile().subscribe({
-      next: (user) => {
-        this.currentUser = user;
-        this.profileForm.patchValue({
-          name: user.name,
-          email: user.email
-        });
-      },
-      error: (error) => {
-        this.snackBar.open('Erro ao carregar perfil', 'Fechar', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
-      }
-    });
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+      this.profileForm.patchValue({
+        name: user.name,
+        email: user.email
+      });
+    }
   }
 
   updateProfile(): void {
     if (this.profileForm.valid) {
-      this.isProfileLoading = true;
-      const updateRequest: UpdateProfileRequest = this.profileForm.value;
-
-      this.userService.updateProfile(updateRequest).subscribe({
-        next: (user) => {
-          this.isProfileLoading = false;
-          this.currentUser = user;
-          this.snackBar.open('Perfil atualizado com sucesso!', 'Fechar', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
+      const request: UpdateProfileRequest = this.profileForm.value;
+      
+      this.userService.updateProfile(request).subscribe({
+        next: () => {
+          this.showMessage('Profile updated successfully');
+          this.loadUserProfile();
         },
-        error: (error) => {
-          this.isProfileLoading = false;
-          const message = error.error?.message || 'Erro ao atualizar perfil';
-          this.snackBar.open(message, 'Fechar', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
+        error: (error: any) => {
+          console.error('Error updating profile:', error);
+          this.showMessage('Error updating profile');
         }
       });
     }
@@ -371,32 +547,66 @@ export class SettingsComponent implements OnInit {
 
   changePassword(): void {
     if (this.passwordForm.valid) {
-      this.isPasswordLoading = true;
-      const changeRequest: ChangePasswordRequest = this.passwordForm.value;
+      const request: ChangePasswordRequest = {
+        currentPassword: this.passwordForm.value.currentPassword,
+        newPassword: this.passwordForm.value.newPassword
+      };
 
-      this.userService.changePassword(changeRequest).subscribe({
+      this.userService.changePassword(request).subscribe({
         next: () => {
-          this.isPasswordLoading = false;
-          this.passwordForm.reset();
-          this.snackBar.open('Senha alterada com sucesso!', 'Fechar', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
+          this.showMessage('Password changed successfully');
+          this.resetPasswordForm();
         },
-        error: (error) => {
-          this.isPasswordLoading = false;
-          const message = error.error?.message || 'Erro ao alterar senha';
-          this.snackBar.open(message, 'Fechar', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
+        error: (error: any) => {
+          console.error('Error changing password:', error);
+          this.showMessage('Error changing password');
         }
       });
     }
   }
 
+  savePreferences(): void {
+    this.showMessage('Preferences saved successfully');
+  }
+
+  resetProfileForm(): void {
+    this.loadUserProfile();
+  }
+
+  resetPasswordForm(): void {
+    this.passwordForm.reset();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth/signin']);
+  }
+
+  getUserInitials(): string {
+    if (this.currentUser?.name) {
+      return this.currentUser.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+    return 'U';
+  }
+
+  private passwordMatchValidator(form: FormGroup) {
+    const newPassword = form.get('newPassword');
+    const confirmPassword = form.get('confirmPassword');
+    
+    if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
+
+  private showMessage(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000
+    });
   }
 }
