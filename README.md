@@ -332,11 +332,11 @@ O video demonstra:
 
 ## 🤝 Contribuição
 
-Este projeto foi desenvolvido especificamente para o processo seletivo da Ford, demonstrando capacidades técnicas em desenvolvimento full-stack, DevOps e boas práticas de engenharia de software.
+Este projeto foi desenvolvido especificamente para o processo seletivo IEL em parceria  com a Ford, demonstrando capacidades técnicas em desenvolvimento full-stack, DevOps e boas práticas de engenharia de software.
 
 ## 📄 Licença
 
-Este projeto é privado e destinado exclusivamente para avaliação no processo seletivo da Ford.
+Este projeto é privado e destinado exclusivamente para avaliação no processo seletivo IEL em parceria  com a Ford.
 
 ---
 
