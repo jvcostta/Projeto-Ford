@@ -146,7 +146,10 @@ import { User, UpdateProfileRequest, ChangePasswordRequest } from '../../core/mo
                   Nova senha é obrigatória
                 </mat-error>
                 <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
-                  A senha deve ter no mínimo 6 caracteres
+                  A senha deve ter no mínimo 8 caracteres
+                </mat-error>
+                <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('pattern')">
+                  A senha deve conter: 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial
                 </mat-error>
               </mat-form-field>
 
@@ -508,7 +511,11 @@ export class SettingsComponent implements OnInit {
 
     this.passwordForm = this.fb.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [
+        Validators.required, 
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&].*$/)
+      ]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
@@ -554,14 +561,26 @@ export class SettingsComponent implements OnInit {
 
       this.userService.changePassword(request).subscribe({
         next: () => {
-          this.showMessage('Password changed successfully');
+          this.showMessage('Senha alterada com sucesso!');
           this.resetPasswordForm();
         },
         error: (error: any) => {
-          console.error('Error changing password:', error);
-          this.showMessage('Error changing password');
+          console.error('Erro ao alterar senha:', error);
+          let errorMessage = 'Erro ao alterar senha';
+          
+          if (error.status === 400) {
+            errorMessage = error.error?.message || 'Dados inválidos. Verifique os campos.';
+          } else if (error.status === 401) {
+            errorMessage = 'Senha atual incorreta.';
+          } else if (error.status === 403) {
+            errorMessage = 'Acesso negado. Faça login novamente.';
+          }
+          
+          this.showMessage(errorMessage);
         }
       });
+    } else {
+      this.showMessage('Por favor, preencha todos os campos corretamente.');
     }
   }
 
