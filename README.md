@@ -165,10 +165,6 @@ POST /api/auth/register
 
 ### Usuário Administrador
 - **Email**: admin@ford.com
-- **Senha**: admin123
-
-### Usuário Comum
-- **Email**: user@ford.com
 - **Senha**: NewPass123!
 
 *Nota: Estes usuários são criados automaticamente na inicialização da aplicação*
